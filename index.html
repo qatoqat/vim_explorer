@@ -3,257 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vim Mode Explorer</title>
+    <title>Vim Movement Map</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: monospace; }
-        
-        .mode-tabs {
-            display: flex;
-            gap: 1px;
-            background: #eee;
-        }
-        
-        .mode-tab {
-            padding: 0.5rem 1rem;
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-        
-        .mode-tab.active {
-            background: white;
-            font-weight: bold;
-        }
-        
-        .mode-content {
-            display: none;
-            padding: 1rem;
-        }
-        
-        .mode-content.active {
-            display: block;
-        }
-        
-        .command-grid {
+        body { font-family: monospace; padding: 20px; }
+
+        .movement-container {
             display: grid;
-            gap: 1rem;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
-        
-        .command-group {
-            border: 1px solid #ddd;
-            padding: 0.5rem;
+
+        .movement-box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            position: relative;
         }
-        
-        .command-group h3 {
-            margin-bottom: 0.5rem;
-            font-size: 1em;
-        }
-        
-        .modifier-tabs {
-            display: flex;
-            gap: 1px;
-            background: #f5f5f5;
-            margin-bottom: 0.5rem;
-        }
-        
-        .modifier-tab {
-            padding: 0.25rem 0.5rem;
-            border: none;
-            background: none;
-            font-size: 0.9em;
-            cursor: pointer;
-        }
-        
-        .modifier-tab.active {
+
+        .movement-title {
+            position: absolute;
+            top: -12px;
+            left: 10px;
             background: white;
+            padding: 0 5px;
         }
-        
-        .key-grid {
+
+        .movement-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .key {
+            border: 1px solid #eee;
+            padding: 8px;
             text-align: center;
         }
-        
-        .key {
-            padding: 0.25rem;
-            border: 1px solid #eee;
-        }
-        
-        .key-left { grid-column: 1; grid-row: 2; }
-        .key-right { grid-column: 3; grid-row: 2; }
-        .key-up { grid-column: 2; grid-row: 1; }
-        .key-down { grid-column: 2; grid-row: 3; }
-        .key-center { grid-column: 2; grid-row: 2; }
+
+        .left { grid-column: 1; grid-row: 2; }
+        .right { grid-column: 3; grid-row: 2; }
+        .up { grid-column: 2; grid-row: 1; }
+        .down { grid-column: 2; grid-row: 3; }
+        .center { grid-column: 2; grid-row: 2; }
     </style>
 </head>
 <body>
-    <div class="mode-tabs">
-        <button class="mode-tab active" onclick="showMode(event, 'normal')">Normal Mode</button>
-        <button class="mode-tab" onclick="showMode(event, 'insert')">Insert Mode</button>
-        <button class="mode-tab" onclick="showMode(event, 'visual')">Visual Mode</button>
-        <button class="mode-tab" onclick="showMode(event, 'command')">Command Mode</button>
-    </div>
-
-    <div id="normal-mode" class="mode-content active">
-        <div class="command-grid">
-            <div class="command-group">
-                <h3>Basic Movement</h3>
-                <div class="key-grid">
-                    <div class="key key-up">k (up)</div>
-                    <div class="key key-left">h (left)</div>
-                    <div class="key key-right">l (right)</div>
-                    <div class="key key-down">j (down)</div>
-                </div>
+    <div class="movement-container">
+        <div class="movement-box">
+            <div class="movement-title">Character</div>
+            <div class="movement-grid">
+                <div class="key up">k (up)</div>
+                <div class="key left">h (left)</div>
+                <div class="key right">l (right)</div>
+                <div class="key down">j (down)</div>
+                <div class="key center">.</div>
             </div>
+        </div>
 
-            <div class="command-group">
-                <h3>Word Movement</h3>
-                <div class="modifier-tabs">
-                    <button class="modifier-tab active" onclick="showModifier(this, 'word-normal')">Normal</button>
-                    <button class="modifier-tab" onclick="showModifier(this, 'word-shift')">With Shift</button>
-                </div>
-                <div id="word-normal" class="modifier-content">
-                    <div class="key-grid">
-                        <div class="key key-left">b (back)</div>
-                        <div class="key key-right">w (next)</div>
-                        <div class="key key-center">e (end)</div>
-                    </div>
-                </div>
-                <div id="word-shift" class="modifier-content" style="display:none">
-                    <div class="key-grid">
-                        <div class="key key-left">B (WORD back)</div>
-                        <div class="key key-right">W (WORD next)</div>
-                        <div class="key key-center">E (WORD end)</div>
-                    </div>
-                </div>
+        <div class="movement-box">
+            <div class="movement-title">Word</div>
+            <div class="movement-grid">
+                <div class="key left">b (prev)</div>
+                <div class="key right">w (next)</div>
+                <div class="key up">B (WORD)</div>
+                <div class="key down">W (WORD)</div>
+                <div class="key center">e (end)</div>
             </div>
+        </div>
 
-            <div class="command-group">
-                <h3>Line Movement</h3>
-                <div class="key-grid">
-                    <div class="key key-left">0 (start)</div>
-                    <div class="key key-right">$ (end)</div>
-                    <div class="key key-center">^ (first char)</div>
-                </div>
+        <div class="movement-box">
+            <div class="movement-title">Line</div>
+            <div class="movement-grid">
+                <div class="key left">0 (start)</div>
+                <div class="key right">$ (end)</div>
+                <div class="key center">^ (first)</div>
             </div>
+        </div>
 
-            <div class="command-group">
-                <h3>Page Movement</h3>
-                <div class="key-grid">
-                    <div class="key key-up">gg (top)</div>
-                    <div class="key key-down">G (bottom)</div>
-                    <div class="key key-left">Ctrl+u (up)</div>
-                    <div class="key key-right">Ctrl+d (down)</div>
-                    <div class="key key-center">zz (center)</div>
-                </div>
+        <div class="movement-box">
+            <div class="movement-title">Paragraph</div>
+            <div class="movement-grid">
+                <div class="key up">{ (prev)</div>
+                <div class="key down">} (next)</div>
+                <div class="key center">) (sentence)</div>
+            </div>
+        </div>
+
+        <div class="movement-box">
+            <div class="movement-title">Screen</div>
+            <div class="movement-grid">
+                <div class="key up">H (high)</div>
+                <div class="key down">L (low)</div>
+                <div class="key center">M (middle)</div>
+                <div class="key left">^U (up)</div>
+                <div class="key right">^D (down)</div>
+            </div>
+        </div>
+
+        <div class="movement-box">
+            <div class="movement-title">File</div>
+            <div class="movement-grid">
+                <div class="key up">gg (top)</div>
+                <div class="key down">G (end)</div>
+                <div class="key left">^B (page↑)</div>
+                <div class="key right">^F (page↓)</div>
+                <div class="key center">% (jump)</div>
             </div>
         </div>
     </div>
-
-    <div id="insert-mode" class="mode-content">
-        <div class="command-grid">
-            <div class="command-group">
-                <h3>Enter Insert</h3>
-                <div class="key-grid">
-                    <div class="key key-up">O (line above)</div>
-                    <div class="key key-left">i (before)</div>
-                    <div class="key key-right">a (after)</div>
-                    <div class="key key-down">o (line below)</div>
-                    <div class="key key-center">s (replace char)</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="visual-mode" class="mode-content">
-        <div class="command-grid">
-            <div class="command-group">
-                <h3>Visual Mode Types</h3>
-                <div class="key-grid">
-                    <div class="key key-left">v (char)</div>
-                    <div class="key key-right">V (line)</div>
-                    <div class="key key-center">Ctrl+v (block)</div>
-                </div>
-            </div>
-
-            <div class="command-group">
-                <h3>Selection Movement</h3>
-                <div class="key-grid">
-                    <div class="key key-left">o (flip end)</div>
-                    <div class="key key-right">O (flip corner)</div>
-                    <div class="key key-center">gv (reselect)</div>
-                </div>
-            </div>
-
-            <div class="command-group">
-                <h3>Text Objects</h3>
-                <div class="key-grid">
-                    <div class="key key-left">aw (a word)</div>
-                    <div class="key key-right">iw (in word)</div>
-                    <div class="key key-up">ap (a para)</div>
-                    <div class="key key-down">ip (in para)</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="command-mode" class="mode-content">
-        <div class="command-grid">
-            <div class="command-group">
-                <h3>File Operations</h3>
-                <div class="key-grid">
-                    <div class="key key-left">:w (save)</div>
-                    <div class="key key-right">:q (quit)</div>
-                    <div class="key key-center">:wq (save+quit)</div>
-                </div>
-            </div>
-
-            <div class="command-group">
-                <h3>Search/Replace</h3>
-                <div class="key-grid">
-                    <div class="key key-left">/pat (find)</div>
-                    <div class="key key-right">?pat (back)</div>
-                    <div class="key key-center">:%s/old/new/g</div>
-                </div>
-            </div>
-
-            <div class="command-group">
-                <h3>Buffer Controls</h3>
-                <div class="key-grid">
-                    <div class="key key-left">:bn (next)</div>
-                    <div class="key key-right">:bp (prev)</div>
-                    <div class="key key-center">:ls (list)</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function showMode(event, mode) {
-            document.querySelectorAll('.mode-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.querySelectorAll('.mode-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.getElementById(mode + '-mode').classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function showModifier(tab, content) {
-            const group = tab.closest('.command-group');
-            group.querySelectorAll('.modifier-tab').forEach(t => {
-                t.classList.remove('active');
-            });
-            group.querySelectorAll('.modifier-content').forEach(c => {
-                c.style.display = 'none';
-            });
-            tab.classList.add('active');
-            document.getElementById(content).style.display = 'block';
-        }
-    </script>
 </body>
 </html>
